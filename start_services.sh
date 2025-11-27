@@ -6,30 +6,30 @@ echo "=========================================="
 echo ""
 echo "Configurando Django (executando migrações)..."
 cd frontend_django
-python init_django.py
+python3 manage.py migrate
 cd ..
 
 echo ""
 echo "Iniciando Auth Service (porta 5000)..."
-gnome-terminal --title="Auth Service" -- bash -c "cd auth_service && python app.py; exec bash" &
+gnome-terminal --title="Auth Service" -- bash -c "cd services/auth_service && python3 app.py; exec bash" &
 
 sleep 2
 
 echo ""
 echo "Iniciando Encryption Service (porta 5002)..."
-gnome-terminal --title="Encryption Service" -- bash -c "cd encryption_service && python app.py; exec bash" &
+gnome-terminal --title="Encryption Service" -- bash -c "cd services/encryption_service && python3 app.py; exec bash" &
 
 sleep 2
 
 echo ""
 echo "Iniciando Password Manager Service (porta 5001)..."
-gnome-terminal --title="Password Manager Service" -- bash -c "cd password_manager_service && python app.py; exec bash" &
+gnome-terminal --title="Password Manager Service" -- bash -c "cd services/password_manager_service && python3 app.py; exec bash" &
 
 sleep 2
 
 echo ""
 echo "Iniciando Frontend Django (porta 8000)..."
-gnome-terminal --title="Django Frontend" -- bash -c "cd frontend_django && python manage.py runserver; exec bash" &
+gnome-terminal --title="Django Frontend" -- bash -c "cd frontend_django && python3 manage.py runserver; exec bash" &
 
 echo ""
 echo "=========================================="

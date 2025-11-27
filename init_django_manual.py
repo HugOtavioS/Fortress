@@ -12,11 +12,11 @@ def run_django_commands():
     print("🔧 Inicializando Django...")
     
     # Navega para o diretório do Django
-    os.chdir('frontend_django')
+    django_dir = os.path.join(os.path.dirname(__file__), 'frontend_django')
+    os.chdir(django_dir)
     
     commands = [
-        ['python', 'manage.py', 'migrate', '--run-syncdb'],
-        ['python', 'manage.py', 'migrate'],
+        ['python3', 'manage.py', 'migrate'],
     ]
     
     for command in commands:

@@ -25,39 +25,70 @@ O projeto utiliza uma arquitetura baseada em microsserviços leves:
 
 ```
 project_root/
-├── auth_service/                 # Serviço de Autenticação
-│   ├── app.py                   # Aplicação Flask principal
-│   └── tests/                   # Testes unitários
-│       └── test_auth.py
-├── encryption_service/           # Serviço de Criptografia
-│   ├── app.py                   # Aplicação Flask principal
-│   └── tests/                   # Testes unitários
-│       └── test_encryption.py
-├── password_manager_service/     # Serviço de Gerenciamento de Senhas
-│   ├── app.py                   # Aplicação Flask principal
-│   └── tests/                   # Testes unitários
-│       └── test_password_manager.py
-├── frontend_django/             # Frontend Django
-│   ├── manage.py                # Script de gerenciamento Django
-│   ├── password_manager/        # Configurações do projeto
+├── services/                     # Microsserviços Flask
+│   ├── auth_service/            # Serviço de Autenticação
+│   │   ├── app.py              # Aplicação Flask principal
+│   │   ├── config.py           # Configurações
+│   │   ├── models/             # Modelos de dados
+│   │   │   └── user.py
+│   │   ├── routes/             # Rotas da API
+│   │   │   └── auth_routes.py
+│   │   ├── utils/              # Utilitários
+│   │   │   ├── password.py
+│   │   │   └── jwt_token.py
+│   │   └── tests/             # Testes unitários
+│   │       └── test_auth.py
+│   ├── encryption_service/      # Serviço de Criptografia
+│   │   ├── app.py
+│   │   ├── config.py
+│   │   ├── routes/
+│   │   │   └── encryption_routes.py
+│   │   ├── utils/
+│   │   │   └── encryption.py
+│   │   └── tests/
+│   │       └── test_encryption.py
+│   └── password_manager_service/  # Serviço de Gerenciamento de Senhas
+│       ├── app.py
+│       ├── config.py
+│       ├── models/
+│       │   └── password.py
+│       ├── routes/
+│       │   └── password_routes.py
+│       ├── utils/
+│       │   ├── auth_client.py
+│       │   └── encryption_client.py
+│       └── tests/
+├── frontend_django/            # Frontend Django
+│   ├── manage.py
+│   ├── password_manager/      # Configurações do projeto Django
 │   │   ├── settings.py
 │   │   ├── urls.py
 │   │   └── wsgi.py
-│   ├── password_app/            # Aplicação Django
+│   ├── password_app/          # Aplicação Django
 │   │   ├── views.py
-│   │   └── urls.py
-│   └── templates/               # Templates HTML
+│   │   ├── urls.py
+│   │   └── utils.py
+│   └── templates/            # Templates HTML
 │       ├── base.html
 │       ├── login.html
 │       ├── register.html
 │       ├── dashboard.html
 │       ├── add_password.html
 │       └── edit_password.html
-├── tests/                       # Testes de integração e carga
-│   ├── test_integration.py
-│   └── test_load.py
-├── requirements.txt             # Dependências Python
-└── README.md                   # Este arquivo
+├── tests/                     # Testes de integração e carga
+│   ├── integration/
+│   │   └── test_integration.py
+│   └── load/
+├── scripts/                   # Scripts utilitários
+│   └── debug/                # Scripts de debug
+├── requirements.txt          # Dependências Python
+├── setup_project.py         # Script de configuração inicial
+├── init_django_manual.py     # Script de inicialização do Django
+├── run_tests.py             # Script para executar todos os testes
+├── check_services.py        # Script para verificar status dos serviços
+├── start_services.sh        # Script para iniciar serviços (Linux/Mac)
+├── start_services.bat       # Script para iniciar serviços (Windows)
+└── README.md               # Este arquivo
 ```
 
 ## 🛠️ Instalação e Configuração
@@ -82,7 +113,7 @@ cd fortress
 python -m venv venv
 venv\Scripts\activate
 
-# Linux/Mac
+# Linux/Mac (POPOS, Ubuntu, etc.)
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -98,6 +129,10 @@ pip install -r requirements.txt
 **Execute este comando ANTES de iniciar os serviços:**
 
 ```bash
+# Linux/Mac (POPOS, Ubuntu, etc.)
+python3 init_django_manual.py
+
+# Windows
 python init_django_manual.py
 ```
 
@@ -106,33 +141,35 @@ Este comando cria as tabelas necessárias do Django, incluindo a tabela `django_
 ### 5. Inicie os Serviços
 
 **Opção 1 - Script Automático:**
-- Windows: `start_services.bat`
-- Linux/Mac: `./start_services.sh`
+- Windows: `start_services.bat` (usa `python -m` internamente)
+- Linux/Mac: `./start_services.sh` (usa `python -m` internamente)
 
 **Opção 2 - Manual (4 terminais separados):**
+
+Observação: para evitar o erro "attempted relative import with no known parent package", execute os serviços como módulos a partir da raiz do projeto usando `-m`.
 
 **Terminal 1 - Auth Service:**
 ```bash
 cd auth_service
-python app.py
+python3 app.py
 ```
 
 **Terminal 2 - Encryption Service:**
 ```bash
 cd encryption_service
-python app.py
+python3 app.py
 ```
 
 **Terminal 3 - Password Manager Service:**
 ```bash
 cd password_manager_service
-python app.py
+python3 app.py
 ```
 
 **Terminal 4 - Frontend Django:**
 ```bash
 cd frontend_django
-python manage.py runserver
+python3 manage.py runserver
 ```
 
 ### 6. Acesse a Aplicação
@@ -145,24 +182,26 @@ Abra seu navegador e acesse: `http://localhost:8000`
 
 ```bash
 # Testes do Auth Service
-cd auth_service
-python -m pytest tests/ -v
+cd services/auth_service
+python3 -m pytest tests/ -v
 
 # Testes do Encryption Service
-cd encryption_service
-python -m pytest tests/ -v
+cd services/encryption_service
+python3 -m pytest tests/ -v
 
 # Testes do Password Manager Service
-cd password_manager_service
-python -m pytest tests/ -v
+cd services/password_manager_service
+python3 -m pytest tests/ -v
 ```
 
 ### Testes de Integração
 
 ```bash
 # Certifique-se de que todos os serviços estão rodando
-cd tests
-python -m pytest test_integration.py -v
+python3 -m pytest tests/integration/ -v
+
+# Ou use o script de testes
+python3 run_tests.py
 ```
 
 ### Testes de Carga
@@ -172,7 +211,7 @@ python -m pytest test_integration.py -v
 pip install locust
 
 # Execute os testes de carga
-cd tests
+cd tests/load
 locust -f test_load.py --host=http://localhost:5001
 ```
 
@@ -268,6 +307,10 @@ Este projeto é de código aberto e está disponível sob a licença MIT.
 **Solução:** Execute o comando de inicialização do Django:
 
 ```bash
+# Linux/Mac (POPOS, Ubuntu, etc.)
+python3 init_django_manual.py
+
+# Windows
 python init_django_manual.py
 ```
 
@@ -275,15 +318,20 @@ Ou manualmente:
 
 ```bash
 cd frontend_django
+# Linux/Mac
+python3 manage.py migrate
+# Windows
 python manage.py migrate
 ```
 
 ### Erro de Porta em Uso
 
-Se alguma porta estiver em uso, altere a porta no arquivo `app.py` correspondente:
+Se alguma porta estiver em uso, altere a porta no arquivo `config.py` do serviço correspondente ou use variáveis de ambiente:
 
-```python
-app.run(host='0.0.0.0', port=5000, debug=True)  # Mude a porta aqui
+```bash
+export AUTH_PORT=5000
+export PM_PORT=5001
+export ENCRYPTION_PORT=5002
 ```
 
 ### Erro de Dependências
@@ -312,9 +360,10 @@ Se houver erros de CSRF, as views já estão configuradas com `@csrf_exempt` par
 
 **IMPORTANTE:** Sempre execute nesta ordem:
 
-1. `python init_django_manual.py` (apenas uma vez)
+1. `python3 init_django_manual.py` (apenas uma vez) - Linux/Mac
+   `python init_django_manual.py` - Windows
 2. Inicie os serviços Flask (Auth, Encryption, Password Manager)
-3. Inicie o Django (`python manage.py runserver`)
+3. Inicie o Django (`python3 manage.py runserver` - Linux/Mac, `python manage.py runserver` - Windows)
 
 ## 📞 Suporte
 

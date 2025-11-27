@@ -33,19 +33,19 @@ def main():
     # Lista de testes para executar
     tests = [
         {
-            "command": "cd auth_service && python -m pytest tests/ -v",
+            "command": "cd services/auth_service && python3 -m pytest tests/ -v",
             "description": "Testes Unitários - Auth Service"
         },
         {
-            "command": "cd encryption_service && python -m pytest tests/ -v",
+            "command": "cd services/encryption_service && python3 -m pytest tests/ -v",
             "description": "Testes Unitários - Encryption Service"
         },
         {
-            "command": "cd password_manager_service && python -m pytest tests/ -v",
+            "command": "cd services/password_manager_service && python3 -m pytest tests/ -v",
             "description": "Testes Unitários - Password Manager Service"
         },
         {
-            "command": "python -m pytest tests/test_integration.py -v",
+            "command": "python3 -m pytest tests/integration/ -v",
             "description": "Testes de Integração"
         }
     ]

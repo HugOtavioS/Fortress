@@ -4,8 +4,15 @@ Testes unitários para o serviço de autenticação
 import pytest
 import json
 import os
+import sys
 import tempfile
-from app import app, init_db, hash_password, verify_password, generate_token, verify_token
+
+# Adiciona o diretório pai ao path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app import app, init_db
+from utils.password import hash_password, verify_password
+from utils.jwt_token import generate_token, verify_token
 
 @pytest.fixture
 def client():

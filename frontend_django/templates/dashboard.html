@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Fortress{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 1000px;">
+    <h2>Bem-vindo, {{ username }}!</h2>
+    
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    
+    <div style="text-align: right; margin-bottom: 20px;">
+        <a href="{% url 'add_password' %}" class="btn" style="display: inline-block; width: auto;">+ Adicionar Senha</a>
+    </div>
+    
+    {% if passwords %}
+    <table>
+        <thead>
+            <tr>
+                <th>Site</th>
+                <th>Username</th>
+                <th>Senha</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for password in passwords %}
+            <tr>
+                <td>{{ password.site }}</td>
+                <td>{{ password.username }}</td>
+                <td>
+                    <span class="password-display" id="pwd-{{ password.id }}" style="display: none;">Carregando...</span>
+                    <span class="password-hidden" id="hidden-{{ password.id }}">••••••••</span>
+                    <button onclick="togglePassword({{ password.id }})" class="btn-small" style="margin-left: 10px;">Mostrar</button>
+                </td>
+                <td>
+                    <a href="{% url 'edit_password' password.id %}" class="btn btn-secondary btn-small">Editar</a>
+                    <form method="POST" action="{% url 'delete_password' password.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Tem certeza que deseja deletar esta senha?')">Deletar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <p>Você ainda não tem senhas cadastradas.</p>
+        <a href="{% url 'add_password' %}" class="btn" style="display: inline-block; width: auto; margin-top: 20px;">Adicionar Primeira Senha</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+async function togglePassword(id) {
+    const display = document.getElementById('pwd-' + id);
+    const hidden = document.getElementById('hidden-' + id);
+    const btn = event.target;
+    
+    if (display.style.display === 'none') {
+        // Se ainda não carregou, busca a senha
+        if (display.textContent === 'Carregando...') {
+            try {
+                const response = await fetch(`/edit-password/${id}/`);
+                if (response.ok) {
+                    // A senha será mostrada quando o usuário editar
+                    display.textContent = 'Clique em Editar para ver';
+                }
+            } catch (e) {
+                display.textContent = 'Erro ao carregar';
+            }
+        }
+        display.style.display = 'inline';
+        hidden.style.display = 'none';
+        btn.textContent = 'Ocultar';
+    } else {
+        display.style.display = 'none';
+        hidden.style.display = 'inline';
+        btn.textContent = 'Mostrar';
+    }
+}
+</script>
+{% endblock %}
+

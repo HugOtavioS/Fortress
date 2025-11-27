@@ -34,7 +34,9 @@ def create_virtual_environment():
         print("✅ Ambiente virtual já existe")
         return True
     
-    return run_command("python -m venv venv", "Criando ambiente virtual")
+    # Usa python3 no Linux/Mac, python no Windows
+    python_cmd = "python3" if platform.system() != "Windows" else "python"
+    return run_command(f"{python_cmd} -m venv venv", "Criando ambiente virtual")
 
 def activate_virtual_environment():
     """Ativa ambiente virtual"""
